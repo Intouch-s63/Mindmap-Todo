@@ -1,0 +1,32 @@
+{
+    "nodeData": {
+        "id": "1651728883333root",
+        "topic": "Todo",
+        "root": true,
+        "children": [
+            {
+                "topic": "Buy Milk",
+                "id": "092b8048abfc11b4",
+                "direction": 0,
+                "children": [
+                    {
+                        "topic": "20 bottles",
+                        "id": "092b8ed678485639"
+                    }
+                ]
+            },
+            {
+                "topic": "Buy Apple",
+                "id": "092b848908ab90a5",
+                "direction": 1,
+                "children": [
+                    {
+                        "topic": "10 kg",
+                        "id": "092b87810c0fb51e"
+                    }
+                ]
+            }
+        ]
+    },
+    "linkData": {}
+}
