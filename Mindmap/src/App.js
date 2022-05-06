@@ -14,6 +14,9 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { paperClasses } from '@mui/material';
 import hotkeys from 'hotkeys-js';
 import { Box, ChakraProvider } from "@chakra-ui/react";
+import { Player } from 'video-react';
+import AddTodoTag from './AddTodoTag.gif'
+import { color } from '@mui/system';
 
 var mindstring = '';
 
@@ -618,15 +621,38 @@ function App() {
             <QuestionMarkIcon />
           </Fab>} modal>
           <div className='container'>
-            <div style={{fontWeight: 'bold', textAlign: 'center', marginTop: '15px', fontSize: '25px'}}> Create Mindmap for Todo List </div>
-            <div style ={{textAlign: 'center', marginBottom: '15px'}}>
+            <div style={{fontWeight: 'bold', textAlign: 'center', marginTop: '15px', fontSize: '30px'}}> Mindmap-Todo </div>
+            <br/>
+            <div style={{fontWeight: 'bold', textAlign: 'left', marginLeft: '50 px', marginTop: '15px', fontSize: '25px'}}>
+              Controls Shortcut
+            </div>
+            <div style ={{textAlign: 'left', marginBottom: '15px', fontSize: '20px',marginLeft: '100px'}}>
               <br />
-              การจะ Export Mindmap ไปยัง TodoList นั้น Mindmap จะต้องมีเงื่อนไขดังนี้
-              <br />
-              <img src={mindmaptotodo} style={{height:'400px'}}></img>
-              <br />
-              ลูกของหัวข้อจะเป็น Title รายการ Todo และลูกของ Title นั้นจะเป็น Description ซึ่งเมื่อกดปุ่ม Export ไปยัง Todo App แล้วจะเป็นไปดังภาพ
-              <br />
+             <p> Add a Child: Tab </p>
+             <p> Add a sibling: Enter </p>
+             <p> Move up: PgUp </p>
+             <p> Move down: PgDn </p>
+             <p> Add tag Todo: T </p>
+             <p> Delete tag Todo: D </p> 
+             <br/>
+            </div>
+            <div style={{fontWeight: 'bold', textAlign: 'left', marginLeft: '70 px', marginTop: '15px', fontSize: '25px'}}>
+               Mindmap link to TodoApp
+            </div> 
+            <div style ={{textAlign: 'left', marginBottom: '15px', fontSize: '20px',marginLeft: '10px',marginRight:'10px'}}>
+              <br/>
+              <p>This Mindmapp webapp are link to Todolist app
+              you can link your content in mindmap to Todolistapp
+              by add tag "Todo" to node that you want it to be
+              title of your todo list (only work with root child)
+              and child of your title will be describtion of your
+              todolist
+              </p>
+              <img  src = {AddTodoTag} alt = "loading. . ."
+               style={{width: '425px', height: '100%',border: '10px'}}/>
+              <p>You can visit our Todolist App by this link</p>
+              <a href={'https://6272d8342f4e2817b3a3e550--todoreactnative-g1.netlify.app/'}>TodoListApp</a>
+              
             </div>
           </div>
       </Popup>
