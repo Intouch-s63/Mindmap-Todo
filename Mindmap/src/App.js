@@ -23,12 +23,21 @@ let mind = null;
 function App() {
 
   const [Data, setData] = useState([]);
+  const [show, setShow] = useState(false);
+  const [Json,setJson] = useState([])
+
+  
 
   let selectnode = null;
   let dbnow = null;
   let dbMindmap = null;
 
-
+  const handleClose = () => setShow(false);
+  const handleShow = () => {
+    mindstring = mind.getAllData();
+    setJson(JSON.stringify(mindstring,null,2))
+    setShow(true)
+  }
 
   //สร้างมายแมพ
   useEffect(() => {
@@ -520,9 +529,18 @@ function App() {
       goToNode(widthNum,heightNum)
   }
 
+  const JsonPreview = () => {
+    mindstring = mind.getAllData();
+    console.log(JSON.stringify(mindstring))
+    const JsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+      JSON.stringify(mindstring)
+    )}`;
+  }
+
   //Export JSON
   const exportData = () => {
     mindstring = mind.getAllData();
+    var preJson = JSON.stringify(mindstring)
     console.log(mindstring)
     const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
       JSON.stringify(mindstring)
@@ -558,6 +576,18 @@ function App() {
     </div>
     <div >
       <Button variant="outline-secondary" onClick={() => paint()}>Export PNG</Button>{' '}
+      <Button variant="outline-success" onClick={handleShow} >Preview JSON</Button>{' '}
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>JSON Preview</Modal.Title>
+        </Modal.Header>
+        <Modal.Body><pre>{Json}</pre></Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleClose}>
+            Ok
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Button variant="outline-success" onClick={exportData} >Export JSON</Button>{' '}
       <Popup
         trigger={<Fab
