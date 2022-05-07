@@ -543,7 +543,7 @@ function App() {
     var preJson = JSON.stringify(mindstring)
     console.log(mindstring)
     const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
-      JSON.stringify(mindstring)
+      JSON.stringify(mindstring,null,2)
     )}`;
     const link = document.createElement("a");
     link.href = jsonString;
