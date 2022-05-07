@@ -4,32 +4,31 @@ import ReactDOM from "react-dom";
 import MindElixir, { E } from "mind-elixir";
 import painter from 'mind-elixir/dist/painter';
 import PptxGenJS from "pptxgenjs";
-import { Button, Form, InputGroup, FormControl } from 'react-bootstrap';
+import { Button, Form, Modal} from 'react-bootstrap';
 import TodoListDataService from "./services/todo.service";
 import Popup from 'reactjs-popup';
-import { Scrollbars } from 'react-custom-scrollbars-2';
-import mindmaptotodo from './tutorial.png';
 import Fab from '@mui/material/Fab';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import { paperClasses } from '@mui/material';
 import hotkeys from 'hotkeys-js';
-import { Box, ChakraProvider } from "@chakra-ui/react";
-import { Player } from 'video-react';
 import AddTodoTag from './AddTodoTag.gif'
-import { color } from '@mui/system';
+import SelectSearch, {fuzzySearch} from 'react-select-search';
 
 var mindstring = '';
-
 let datajson = '';
-
 let updateCheck = false;
+let mind = null;
+
+
 
 function App() {
 
-  let mind = null;
+  const [Data, setData] = useState([]);
+
   let selectnode = null;
   let dbnow = null;
   let dbMindmap = null;
+
+
 
   //สร้างมายแมพ
   useEffect(() => {
@@ -75,7 +74,11 @@ function App() {
 
         mind.initSide();
     
-        mind.getAllDataString();
+        let mindData = mind.getAllDataString();
+        console.log(datadb.nodeData)
+        setData([]);
+        DropdownList(datadb.nodeData)
+        console.log(Data)
 
         hotkeys('t', function(event, handler) {
           event.preventDefault();
@@ -109,6 +112,8 @@ function App() {
                 let todoObj = [];
                 let mindTodo = mind.getAllData();
                 todoObj = getAllTodo(mindTodo.nodeData,todoObj);
+                setData([]);
+                DropdownList(datadb.nodeData)
                 console.log(todoObj);
                 exportTodo(todoObj)
               }
@@ -122,6 +127,8 @@ function App() {
                 let todoObj = [];
                 let mindTodo = mind.getAllData();
                 todoObj = getAllTodo(mindTodo.nodeData,todoObj);
+                setData([]);
+                DropdownList(datadb.nodeData)
                 console.log(todoObj);
                 exportTodo(todoObj)
               }
@@ -140,6 +147,9 @@ function App() {
         mind.bus.addListener('unselectNode', node => {
           selectnode = node;
         })
+
+        setData([]);
+        DropdownList(datadb.nodeData)
       }
     })
     .catch(e =>{
@@ -160,6 +170,9 @@ function App() {
           dbMindmap = response.data;
           let dbjson = databaseToJSON(response.data);
           mind.nodeData = dbjson.nodeData;
+          setData([]);
+          DropdownList(mind.nodeData)
+          console.log(Data)
           mind.refresh();
 
         }
@@ -446,43 +459,30 @@ function App() {
   var lastIdCheck = false;
   var foundId = false;
 
+  const DropdownList = (obj) => {
+    if (!('children' in obj) || obj.children.length === 0 ){
+      if ( !obj.hasOwnProperty('root') ){
+        setData(Data => [...Data,{value: obj.id, name: obj.topic}])
+      }
+    } else { 
+      if ( !obj.hasOwnProperty('root') ){
+        setData(Data => [...Data,{value: obj.id, name: obj.topic}])
+      }
+      for (let i = 0 ; i < obj.children.length ; i++){
+        DropdownList(obj.children[i])
+      }
+    }
+  }
+
   const searchNode = (e) => {
-    e.preventDefault();
+   
+    console.log(e)
+      mind.selectNode(e)
 
-    if (searchString == ''){ //ไม่ใส่อะไรในช่องเซิช
-      window.alert('Type something!')
-      searchTemp = '';
-      return;
-    }
-    if (searchString !== searchTemp){ //เซิชคำใหม่ รีทั้งหมด
-      console.log(searchString, searchTemp)
-      console.log('แก้คำใหม่ เซิชใหม่')
-      foundId = false;
-      lastIdCheck = false;
-    }
-
-    console.log(retrieveId);
-    var allMind = mind.getAllData();
-
-    if (foundId == false && lastIdCheck == false){ //เริ่มเซิชใหม่
-      console.log('เริ่มเซิชใหม่')
-      retrieveId = [];
-      searchData(allMind.nodeData,searchString);
-      searchTemp = searchString;
-      console.log(retrieveId);
-    }
-
-    if (foundId == false){ //ไม่เจอเลย
-      window.alert(searchString + ' not found.')
-      lastIdCheck = false;
-    } else { //เจออยู่ก็ไปหาโนดนั้นๆ
-
-      mind.selectNode(E(retrieveId[0]))
-
-      let xystring = E(retrieveId[0]).parentElement.parentElement.getAttribute('style');
+      let xystring = (e).parentElement.parentElement.getAttribute('style');
 
       if ( xystring == null ){
-        xystring = E(retrieveId[0]).parentElement.parentElement.parentElement.parentElement.getAttribute('style');
+        xystring = (e).parentElement.parentElement.parentElement.parentElement.getAttribute('style');
       }
 
       let stringsplit = xystring.split(' ')
@@ -518,53 +518,12 @@ function App() {
       }
 
       goToNode(widthNum,heightNum)
-
-      if (retrieveId.length > 2){ //มากกว่า 2
-        retrieveId.shift();
-        console.log('มากกว่า 2');
-        foundId = true;
-        lastIdCheck = false;
-        console.log(foundId,lastIdCheck)
-      } else if (retrieveId.length == 2){ //ตัวรองท้าย
-        retrieveId.shift();
-        console.log('ตัวรองท้าย');
-        foundId = true;
-        lastIdCheck = true;
-        console.log(foundId,lastIdCheck)
-      } else { //ตัวสุดท้าย == 1 ตัดจบ
-        retrieveId.shift();
-        console.log('ตัวท้าย เริ่มใหม่');
-        lastIdCheck = false;
-        foundId = false;
-        console.log(foundId,lastIdCheck)
-      }
-    }
-  }
-
-  const searchData = (obj,text) => {
-
-    //console.log(obj.topic,text)
-    let topicLower = obj.topic.toLowerCase();
-    let textLower = text.toLowerCase();
-    
-    if (topicLower.match(textLower)) {
-      //console.log(obj.id)
-      retrieveId.push(obj.id);
-      foundId = true;
-
-    } else if (!('children' in obj) || obj.children.length === 0){
-      return;
-
-    } else {
-      for (let i = 0 ; i < obj.children.length ; i++){
-        searchData(obj.children[i],text)
-      }
-    }
   }
 
   //Export JSON
   const exportData = () => {
     mindstring = mind.getAllData();
+    console.log(mindstring)
     const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
       JSON.stringify(mindstring)
     )}`;
@@ -580,10 +539,6 @@ function App() {
     painter.exportPng(mind,'picture');
   }
 
-  const handleChange = (event) => {
-    searchString =  event.target.value;
-    //console.log(searchString)
-  }
 
   return (
     <>
@@ -592,23 +547,18 @@ function App() {
         <Form.Label>Import JSON File</Form.Label>
         <Form.Control type="file" onChange={readJSON}/>
       </Form.Group>
-      <div>
-      <form>
-        <input
-          type="text"
-          name="text"
-          placeholder="Search..."
-          //value={searchtext}
-          onChange={handleChange}
-        />
-        <button onClick={(e)=>searchNode(e)}>Search</button>
-      </form>
+      <div style={{marginBottom:'20px',marginLeft:'5px'}}>
+      <SelectSearch
+        options={Data}
+        onChange = {searchNode}
+        search
+        filterOptions={fuzzySearch}
+        placeholder = "Search node"/>
     </div>
     </div>
     <div >
       <Button variant="outline-secondary" onClick={() => paint()}>Export PNG</Button>{' '}
-      <Button variant="outline-success" onClick={() => exportData()}>Export JSON</Button>{' '}
-      {/* <Button variant="outline-success" onClick={() => goToNode()}>search</Button>{' '}   */}
+      <Button variant="outline-success" onClick={exportData} >Export JSON</Button>{' '}
       <Popup
         trigger={<Fab
             sx={{
@@ -616,8 +566,7 @@ function App() {
               bottom: (theme) => theme.spacing(2),
               right: (theme) => theme.spacing(2)
             }}
-            color="secondary"
-    >
+            color="secondary" >
             <QuestionMarkIcon />
           </Fab>} modal>
           <div className='container'>
@@ -652,7 +601,6 @@ function App() {
                style={{width: '425px', height: '100%',border: '10px'}}/>
               <p>You can visit our Todolist App by this link</p>
               <a href={'https://6272d8342f4e2817b3a3e550--todoreactnative-g1.netlify.app/'}>TodoListApp</a>
-              
             </div>
           </div>
       </Popup>
